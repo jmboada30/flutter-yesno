@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:yes_no_app/domain/entities/message.dart';
+import 'package:yes_no_app/presentation/providers/chat_provider.dart';
 import 'package:yes_no_app/presentation/widgets/chat/her_message_bubble.dart';
 import 'package:yes_no_app/presentation/widgets/chat/my_message_bubble.dart';
 import 'package:yes_no_app/presentation/widgets/shared/message_field_box.dart';
@@ -10,8 +13,7 @@ class ChatScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('🕷️ Black Widow'),
-        centerTitle: true,
+        title: const Text('Mi Beba ❤️'),
         leading: const Padding(
             padding: EdgeInsets.all(4.0),
             child: CircleAvatar(
@@ -27,21 +29,24 @@ class ChatScreen extends StatelessWidget {
 class _ChatView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final chatProvider = context.watch<ChatProvider>();
+
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10),
         child: Column(
           children: [
             Expanded(
-                // El listView permite renderizar de forma inteligente y consumiendo pocos recursos los items de una lista
                 child: ListView.builder(
-                    itemCount: 100,
+                    itemCount: chatProvider.messageList.length,
                     itemBuilder: (context, index) {
-                      return (index % 2 == 0)
+                      final message = chatProvider.messageList[index];
+
+                      return (message.fromWho == FromWho.hers)
                           ? const HerMessageBubble()
-                          : const MyMessageBubble();
+                          : MyMessageBubble(message: message);
                     })),
-            const MessageFieldBox()
+            MessageFieldBox(onValue: (value) => chatProvider.sendMessage(value))
           ],
         ),
       ),
